@@ -212,7 +212,7 @@ std::vector<Item> boundary_set() {
 	}
 	// Specials and extremes.
 	for (double d : {0.0, -0.0, HUGE_VAL, -HUGE_VAL, std::nan(""), std::bit_cast<double>(UINT64_C(0xFFF8000000000123)), DBL_MAX, -DBL_MAX, DBL_MIN, -DBL_MIN,
-					 std::nextafter(DBL_MIN, 0.0), 5e-324, -5e-324, FLT_MAX, FLT_MIN, 0x1p63, 0x1p64, -0x1p63, 0.1, -0.1, 1e-30, 0.01, 0.0005}) {
+					 std::nextafter(DBL_MIN, 0.0), 5e-324, -5e-324, double{FLT_MAX}, double{FLT_MIN}, 0x1p63, 0x1p64, -0x1p63, 0.1, -0.1, 1e-30, 0.01, 0.0005}) {
 		add_double(s, d);
 	}
 	add_i64(s, INT64_MIN);

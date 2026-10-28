@@ -28,7 +28,7 @@ a tag byte, an escape field only for the extreme tags, and a tail.
 ```
 
 One tag per binary exponent covers E = -60 to 63, so every integer and every `double` down to 2^-60 takes
-a single tag byte: 5 is `c0a0`, 1 is `be`, a score in [0, 1) is a tag and 7 bytes. The longest encoding
+a single tag byte: 5 is `c040`, 1 is `be`, a score in [0, 1) is a tag and 7 bytes. The longest encoding
 is 10 bytes (a `double` outside the window: tag, 2-byte field, 7 tail bytes); an integer takes at most 9.
 
 ## Why memcmp is the numeric order

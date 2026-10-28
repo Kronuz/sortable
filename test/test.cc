@@ -73,7 +73,7 @@ constexpr bool is(T v, std::string_view hex) {
 
 #ifndef SORTABLE_MUTANT_RUN  // the mutant runs leave the checking to the run-time tests
 static_assert(is(0, "80") && is(1, "be") && is(-1, "41") && is(3, "bf80") && is(1.5, "be80"));
-static_assert(is(5, "c0a0") && is(5u, "c0a0") && is(5.0, "c0a0") && is(5.0f, "c0a0"));
+static_assert(is(5, "c040") && is(5u, "c040") && is(5.0, "c040") && is(5.0f, "c040"));
 static_assert(is(std::int64_t{2147483649}, "dd00000002") && is(std::int64_t{-1073741824}, "23"));
 static_assert(is(std::int64_t{-1073741825}, "22fffffffc") && is(std::int64_t{1761523200}, "dca3fad8"));
 static_assert(is(0.01, "b747ae147ae147b0") && is(0.0005, "b30624dd2f1a9fc0"));

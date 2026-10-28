@@ -86,7 +86,9 @@ def run(args: tuple[int, str, list[tuple[str, str]], str, Path]) -> tuple[int, s
         exe = d / prog
         cc = subprocess.run([cxx, *flags, *extra, str(ROOT / "test" / f"{'test' if prog == 'test' else 'property'}.cc"), "-o", str(exe)], capture_output=True, text=True)
         if cc.returncode != 0:
-            return i, name, "ERROR", cc.stderr.strip().splitlines()[0] if cc.stderr else "compile failed"
+            # A mutant the header's own constexpr evaluation rejects is caught at compile time.
+            err = next((ln for ln in cc.stderr.splitlines() if "error:" in ln), "compile failed")
+            return i, name, "killed", f"compile error: {err.split('error:', 1)[-1].strip()[:120]}"
         r = subprocess.run([str(exe)], capture_output=True, text=True, env={**os.environ, **env})
         if r.returncode != 0:
             first = next((ln for ln in r.stdout.splitlines() if ln.startswith("FAIL")), None) or next(

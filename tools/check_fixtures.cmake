@@ -1,5 +1,6 @@
 # Regenerates test/vectors.txt and test/reject.txt with the reference model and compares them with the
 # committed files. Usage: cmake -DPYTHON=... -DROOT=... -DWORK=... -P check_fixtures.cmake
+cmake_policy(SET CMP0007 NEW)  # keep the empty third element of "reject;gen_reject.py;"
 foreach(spec "vectors;model.py;vectors" "reject;gen_reject.py;")
   list(GET spec 0 name)
   list(GET spec 1 script)

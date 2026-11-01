@@ -26,15 +26,44 @@ docs/mechanisms/sortable.md  How the encoding works.
 docs/status/sortable.md  The build ledger.
 ```
 
-## Build and test
+## Verification and benchmarks
+
+CI (`.github/workflows/ci.yml`) calls the catalog's shared
+[`cmake.yml`](https://github.com/Kronuz/cpp-libraries/blob/main/.github/workflows/cmake.yml) on every push and nightly:
+CTest on Linux (x86-64 GCC and Clang, arm64), macOS (arm64, x86-64) and FreeBSD, then again under
+ASan+UBSan and TSan. The shared method is the catalog's
+[PERFORMANCE.md](https://github.com/Kronuz/cpp-libraries/blob/main/docs/PERFORMANCE.md).
 
 ```sh
-cmake -S . -B build && cmake --build build && ctest --test-dir build
+cmake -S . -B build && cmake --build build && ctest --test-dir build --output-on-failure
+# ASan+UBSan as CI's linux-asan-ubsan job runs it (Linux, Clang)
+CC=clang CXX=clang++ cmake -S . -B build-asan -DCMAKE_BUILD_TYPE=Debug \
+  "-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined -fno-sanitize-recover=undefined -fno-omit-frame-pointer -D_GLIBCXX_ASSERTIONS" \
+  "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined"
+cmake --build build-asan && ASAN_OPTIONS=detect_leaks=1 ctest --test-dir build-asan --output-on-failure
+python3 -I tools/mutants.py      # mutation check in build-mutants/, 4 jobs
+cmake -S . -B build-x -DSORTABLE_EXHAUSTIVE=ON && cmake --build build-x && build-x/sortable_exhaustive_float
+# libFuzzer: a clang that ships it (Linux clang, or Homebrew LLVM on macOS)
+CXX=clang++ cmake -S . -B build-fuzz -DSORTABLE_FUZZ=ON && cmake --build build-fuzz
+python3 -I tools/make_corpus.py corpus && build-fuzz/sortable_fuzz corpus -max_total_time=600 -timeout=5
 ```
 
-Sanitizers go in their own build directories (`build-asan`, `build-tsan`).
-Fuzz: `cmake -B build-fuzz -DSORTABLE_FUZZ=ON` with a clang that ships libFuzzer, then
-`python3 -I tools/make_corpus.py corpus && build-fuzz/sortable_fuzz corpus -max_total_time=600 -timeout=5`.
+The reference is `tools/model.py`, an executable Python model of the format: `test/vectors.txt`
+(113,491 lines) is its output, and `test/reject.txt` (from `tools/gen_reject.py`) holds a
+witness per reject rule. `sortable_fixtures` regenerates both and fails on any difference
+(skipped without Python 3). `sortable` checks the header against both files, every input of up
+to 3 bytes, and the call forms as `static_assert`s; `sortable_property` checks round trip, order
+and cross-type equality against the codec-independent comparator in `test/exact.hh`, at every
+boundary and over random values (`SORTABLE_SEED`, `SORTABLE_RANDOM`). `sortable_size` compares
+the mean encoded size on 16 seeded distributions with constants for Xapian's
+`sortable_serialise`, the codec this one replaces; the program that measured those constants is
+not in this repository. `tools/mutants.py` changes one rule at a time in a copy of
+`sortable.hh` and builds `test.cc` and `property.cc` with ASan and UBSan; it passes (exit 0,
+`0 not as expected`) when a test kills every mutant except the two marked equivalent (D5.4's
+bound and D5.8, implied by D5.9), which must survive. `sortable_exhaustive_float` (minutes, not
+in CI) round-trips all 2^32 floats in value order. `sortable_standalone_fuzz FILE...` replays
+fuzz inputs without libFuzzer. There is no bench target: encoded size is the one performance
+claim, and `sortable_size` checks it.
 
 ## Invariants
 

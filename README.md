@@ -99,7 +99,7 @@ Not for:
 
 ```sh
 cmake -B build && cmake --build build && ctest --test-dir build
-cmake -B build -DSORTABLE_EXHAUSTIVE=ON && cmake --build build && ctest --test-dir build
+cmake -B build -DSORTABLE_EXHAUSTIVE=ON && cmake --build build && build/sortable_exhaustive_float
 cmake -B build -DSORTABLE_FUZZ=ON -DCMAKE_CXX_COMPILER=clang++ && cmake --build build
 python3 -I tools/mutants.py
 ```
@@ -109,7 +109,8 @@ rule, every input of up to three bytes (and four behind each escape tag), and ro
 and cross-type equality over every `int64` near zero, every power of two with its neighbors,
 every `double` exponent and random values of each type. `SORTABLE_EXHAUSTIVE` adds a pass over all
 2^32 `float` values and `SORTABLE_FUZZ` the libFuzzer target; `tools/mutants.py` drops each
-reject rule in turn and shows a test fail.
+reject rule in turn and shows a test fail. `sortable_cli encode|decode` runs the codec over stdin
+lines for tests in other languages; its protocol is in the mechanism note.
 
 ## 🤝 Contributing
 

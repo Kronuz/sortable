@@ -11,6 +11,8 @@ tools/model.py           The executable reference model: the format's bytes are 
 tools/gen_reject.py      Writes test/reject.txt (a witness per D5 rule) from the model.
 tools/mutants.py         Drops one rule at a time in a copy of the header; each must fail a test.
 tools/make_corpus.py     Fuzz seeds from the fixtures.
+tools/cli.cc             sortable_cli encode|decode over stdin lines, for cross-language tests.
+tools/check_cli.py       CTest: drives sortable_cli against the model.
 tools/check_fixtures.cmake  CTest: regenerates the fixtures and compares.
 test/test.cc             Examples, call forms (static_assert), conversions, vectors, reject
                          fixture, all inputs of up to 3 bytes, threads.
@@ -61,7 +63,10 @@ not in this repository. `tools/mutants.py` changes one rule at a time in a copy 
 `sortable.hh` and builds `test.cc` and `property.cc` with ASan and UBSan; it passes (exit 0,
 `0 not as expected`) when a test kills every mutant except the two marked equivalent (D5.4's
 bound and D5.8, implied by D5.9), which must survive. `sortable_exhaustive_float` (minutes, not
-in CI) round-trips all 2^32 floats in value order. `sortable_standalone_fuzz FILE...` replays
+in CI) covers all 2^32 float bit patterns and fails unless it counts 2^32. `sortable_cli`
+(`tools/cli.cc`) runs the codec over stdin lines for the Python port's cross-language test;
+the `sortable_cli` test (`tools/check_cli.py`, skipped without Python 3) drives it against the
+model, and `docs/mechanisms/sortable.md` gives its protocol. `sortable_standalone_fuzz FILE...` replays
 fuzz inputs without libFuzzer. There is no bench target: encoded size is the one performance
 claim, and `sortable_size` checks it.
 

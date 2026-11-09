@@ -1,4 +1,4 @@
-> Status: CURRENT (2026-10-27) how `sortable.hh` encodes a number. The bytes are fixed by `tools/model.py`.
+> Status: CURRENT (2026-11-09) how `sortable.hh` encodes a number. The bytes are fixed by `tools/model.py`.
 
 # How sortable encodes a number
 
@@ -83,3 +83,31 @@ Everything is integer arithmetic and `std::bit_cast`, so the bytes are the same 
 `tools/model.py` is the executable reference. `test/vectors.txt` (113,491 lines) is its output, and
 `test/reject.txt` its witnesses for each reject rule; the C++ tests check both on every platform, and
 `tools/mutants.py` shows each rule is needed by dropping it.
+
+## How the decoder is proven
+
+The decoder reads bytes from users' disks, so its proof does not rest on sampled inputs alone:
+
+1. `sortable_test` decodes every input of up to 3 bytes; `sortable_property` checks round trip, order and
+   cross-type equality at every boundary and over random values against `test/exact.hh`.
+2. `sortable_exhaustive_float` (`-DSORTABLE_EXHAUSTIVE=ON`, minutes, not in CI) covers all 2^32 `float`
+   bit patterns: each non-NaN round trips bit for bit in value order with strictly increasing bytes, and
+   every NaN of either sign is `ff`. It counts the patterns and fails unless the count is 2^32.
+3. `fuzz/decode_fuzz.cc` (libFuzzer, ASan and UBSan, aborting on the first report) checks that an
+   accepted input re-encodes to itself; that its conversions agree (a saturated value equals the exact
+   one when that exists, an integer's `to_double` equals the language's own conversion, saturation lies
+   between 0 and the value); that two decoded halves of the input compare by `memcmp` as by value and
+   their conversions keep that order; and that the first 8 bytes, taken as each type, round trip.
+4. `tools/mutants.py` drops one rule at a time and needs a test to fail for each.
+
+## The command-line driver
+
+`sortable_cli encode` and `sortable_cli decode` run the codec over stdin lines, one answer per line,
+for tests in other languages. `encode` reads `i DECIMAL` (an integer in [-2^63, 2^64)) or `f HEX16`
+(binary64 bits) and writes the encoding's hex. `decode` reads an input's hex (an empty line is the empty
+input) and writes `reject` or the value in `encode`'s input form: `i` for an integer in [-2^63, 2^64),
+`f` for anything else, with every NaN as `f 7ff8000000000000`. So a decoded answer fed back to `encode`
+gives the input. A malformed line is an error (exit 2), never an answer. `tools/check_cli.py`, the
+`sortable_cli` test, drives it against `tools/model.py`: every vector, 100,000 seeded random values, every
+0 to 2 byte string, every 3-byte string starting with an escape tag, the reject witnesses and 200,000
+seeded mutations, then each accepted answer back through `encode`.

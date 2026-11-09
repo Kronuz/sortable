@@ -1,4 +1,4 @@
-> Status: CURRENT (2026-11-01) ledger for step 1 of the sortable-codec work: the `sortable` library.
+> Status: CURRENT (2026-11-09) ledger for step 1 of the sortable-codec work: the `sortable` library.
 
 # sortable (library)
 
@@ -15,12 +15,21 @@
 5. Sanitizers in separate build dirs: ASan+UBSan and TSan, 4 of 4 tests pass.
 6. Fuzz: `fuzz/decode_fuzz.cc`, 4 workers x 10 minutes, 279M runs, 0 findings.
 7. C1: the 20 call forms compile and the 7 others do not, as `static_assert`s in `test/test.cc`.
+8. T2 exhaustive: `sortable_exhaustive_float` covers all 2^32 float bit patterns (it fails unless it
+   counts 2^32), 0 failures.
+9. T4: one CPU-hour (one worker, 3600 s) of `sortable_fuzz -timeout=5` from `tools/make_corpus.py`'s
+   seeds, ASan and UBSan, 0 findings. The target also checks every conversion of an accepted value; a
+   planted saturation bug and a planted `to_double` truncation each die within 60 s.
+10. `tools/cli.cc` (`sortable_cli encode|decode`, stdin lines) for the Python port's cross-language test;
+    `tools/check_cli.py` (CTest `sortable_cli`) drives it against the model over 213,491 values and
+    741,467 decoder inputs, 0 mismatches. The protocol is in `docs/mechanisms/sortable.md`.
+
+Job ids and run counts for 8-10 are in the Xapiand campaign's `sortable-proof` journal.
 
 ## Next
 
-1. T3: `-DSORTABLE_EXHAUSTIVE=ON`, run `sortable_exhaustive_float` once (minutes; not in CI).
-2. One CPU-hour of fuzzing at the gate's commit; the security reviewer's decoder review and a code review.
-3. Optionally add the sub-1/16 s sets to the design's size table, so T5 against the old codec guards the window.
+1. The security reviewer's decoder review and a code review of 8-10.
+2. Optionally add the sub-1/16 s sets to the design's size table, so T5 against the old codec guards the window.
 
 ## Blocked on
 

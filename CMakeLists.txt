@@ -44,6 +44,10 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     target_link_libraries(sortable_exhaustive_float PRIVATE sortable)
   endif()
 
+  # The codec over stdin lines for the cross-language test; sortable_cli checks it against the model.
+  add_executable(sortable_cli tools/cli.cc)
+  target_link_libraries(sortable_cli PRIVATE sortable)
+
   # The fixtures are the model's output: rerun it and compare (skipped without Python 3).
   find_package(Python3 COMPONENTS Interpreter QUIET)
   if(Python3_FOUND)
@@ -51,5 +55,6 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
       COMMAND ${CMAKE_COMMAND}
         -DPYTHON=${Python3_EXECUTABLE} -DROOT=${CMAKE_CURRENT_SOURCE_DIR} -DWORK=${CMAKE_CURRENT_BINARY_DIR}
         -P ${CMAKE_CURRENT_SOURCE_DIR}/tools/check_fixtures.cmake)
+    add_test(NAME sortable_cli COMMAND ${Python3_EXECUTABLE} -I ${CMAKE_CURRENT_SOURCE_DIR}/tools/check_cli.py $<TARGET_FILE:sortable_cli>)
   endif()
 endif()

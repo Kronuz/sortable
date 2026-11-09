@@ -1,4 +1,5 @@
-// T3: every float (2^32 bit patterns) in value order: round trip bit for bit, strictly increasing bytes.
+// T2: every float (all 2^32 bit patterns): each non-NaN in value order round trips bit for bit (-0.0 to
+// 0) with strictly increasing bytes, and every NaN encodes as 0xff.
 // Not part of CI (minutes): build with -DSORTABLE_EXHAUSTIVE=ON and run sortable_exhaustive_float.
 #include <bit>
 #include <cmath>
@@ -39,15 +40,25 @@ int main() {
 	visit(-HUGE_VALF);
 	for (std::uint32_t b = 0xFF7FFFFF; b >= 0x80000001u; --b) visit(std::bit_cast<float>(b));  // -FLT_MAX .. -least subnormal
 	visit(0.0f);
+	// -0.0 encodes as 0 and decodes to 0.
 	CHECK(sortable::encode(-0.0f) == sortable::encode(0.0f));
+	++checked;
 	for (std::uint32_t b = 1; b <= 0x7F7FFFFFu; ++b) visit(std::bit_cast<float>(b));
 	visit(HUGE_VALF);
-	// Every NaN is the single byte 0xff, above +inf.
-	for (std::uint32_t b = 0x7F800001u; b <= 0x7FFFFFFFu; b += 0x101u) {
-		CHECK(sortable::encode(std::bit_cast<float>(b)) == "\xff" && sortable::encode(std::bit_cast<float>(b | 0x80000000u)) == "\xff");
+	// Every NaN, either sign, is the single byte 0xff, above +inf, and decodes to NaN.
+	const auto nan = sortable::decode("\xff");
+	CHECK(nan && nan->is_nan() && std::isnan(nan->to_double()));
+	for (std::uint32_t b = 0x7F800001u; b <= 0x7FFFFFFFu; ++b) {
+		for (const std::uint32_t s : {b, b | 0x80000000u}) {
+			char buf[sortable::max_size];
+			const std::size_t n = sortable::encode(std::bit_cast<float>(s), buf);
+			CHECK_MSG(n == 1 && buf[0] == '\xff', "%08x", s);
+			++checked;
+		}
 	}
 	CHECK(exact::memcmp_order(prev, "\xff") < 0);
 	std::printf("checked %llu floats\n", static_cast<unsigned long long>(checked));
+	CHECK(checked == std::uint64_t{1} << 32);
 	if (check::failures) return 1;
 	std::printf("all floats passed\n");
 	return 0;

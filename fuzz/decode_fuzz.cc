@@ -1,8 +1,9 @@
 // libFuzzer target for the decoder (T4): arbitrary bytes are rejected or re-encode to themselves, and
-// every conversion of an accepted value agrees with the others and truncates toward zero; the input
-// split in two keeps memcmp order equal to numeric order, and the conversions keep it too; its first
-// eight bytes, taken as each type, round trip. Build: cmake -B build-fuzz -DSORTABLE_FUZZ=ON (clang),
-// run build-fuzz/sortable_fuzz.
+// every conversion of an accepted value agrees with the others and truncates toward zero; the same
+// holds for each half of the input split in two, whose memcmp order equals numeric order, with the
+// conversions keeping it too; its first eight bytes, taken as each type, round trip.
+// Build: cmake -B build-fuzz -DSORTABLE_FUZZ=ON (clang). Run: build-fuzz/sortable_fuzz DIR fuzz/corpus,
+// with DIR from tools/make_corpus.py (split-prefixed seeds); fuzz/corpus holds raw encodings.
 #include <bit>
 #include <cmath>
 #include <cstddef>
@@ -55,20 +56,26 @@ void check_conversions(const sortable::number& n, const converted& c, std::strin
 	if (std::isnan(c.d)) fail("a number converts to NaN", in);
 }
 
-}  // namespace
-
-extern "C" int LLVMFuzzerTestOneInput(const std::uint8_t* data, std::size_t size) {
-	const std::string_view in(reinterpret_cast<const char*>(data), size);
+// Decodes `in`; an accepted input re-encodes to itself and converts consistently.
+std::optional<sortable::number> accept(std::string_view in) {
 	const auto n = sortable::decode(in);
 	if (n) {
 		if (exact::reencode(*n) != in) fail("accepted, not canonical", in);
 		check_conversions(*n, converted(*n), in);
 	}
+	return n;
+}
+
+}  // namespace
+
+extern "C" int LLVMFuzzerTestOneInput(const std::uint8_t* data, std::size_t size) {
+	const std::string_view in(reinterpret_cast<const char*>(data), size);
+	accept(in);
 
 	if (size >= 1) {
 		const std::size_t cut = data[0] % size;
 		const std::string_view a = in.substr(1, cut), b = in.substr(1 + cut);
-		const auto x = sortable::decode(a), y = sortable::decode(b);
+		const auto x = accept(a), y = accept(b);
 		if (x && y) {
 			const int c = exact::compare(exact::from_number(*x), exact::from_number(*y));
 			if (c != exact::memcmp_order(a, b)) fail("order", a, b);

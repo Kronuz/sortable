@@ -83,6 +83,14 @@ and `-1022 - exponent` cannot overflow an `int`. `decode` only produces numbers 
 [-1074, 1023] (or [0, 63] for an integer); a `number` built by hand with another exponent or significand
 still converts, but to a value that no `decode` produces.
 
+## Reserved: 128-bit integers
+
+The shape already holds them: exponents 64 to 127 use the `0xFE` escape, and a tail of up to 16 bytes
+carries 127 fraction bits, so `memcmp` order and cross-type equality hold unchanged. Adding them widens
+`decode`'s rules 6, 8 and 9 and `max_size` (to 19 bytes); no value encodable today changes its bytes.
+Not built: no input reaches 128 bits (JSON and msgpack stop at 64), and a 128-bit significand would
+widen the 64-bit path.
+
 ## What fixes the bytes
 
 `tools/model.py` is the executable reference. `test/vectors.txt` (113,491 lines) is its output, and

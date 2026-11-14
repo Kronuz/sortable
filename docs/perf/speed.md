@@ -73,7 +73,10 @@ Repeat the baseline at the same commit to establish A/A spread before trying an 
 No speed experiment is accepted or rejected without numbers. A bulk tail copy and a bounded
 word-load decoder are candidates only; neither is implemented. Next, link a tiny probe against
 a Xapiand build and call only the public `Serialise::serialise(double)` and matching
-`Unserialise` entry point. Measure the same double-valued corpus without reading the old
+`Unserialise` entry point. The current public header exposes `serialise(long double)`,
+not a double overload (`Xapiand/src/serialise.h:252`); explicitly promote a double to
+`long double` to select that overload without ambiguity with the integer/bool overloads.
+Measure the same double-valued corpus without reading the old
 codec implementation; its source was not opened here. Then run interleaved before/after pairs
 and the unchanged fixtures, property test and fuzz corpus on x86_64 macOS and Linux. Keep a
 change only when both platforms clear their own A/A band.

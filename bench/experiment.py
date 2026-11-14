@@ -12,7 +12,7 @@ from pathlib import Path
 
 def main() -> None:
     text = (Path(__file__).resolve().parents[1] / "sortable.hh").read_text()
-    if sys.argv[1] == "encode-switch":
+    if sys.argv[1] in ("encode-switch", "encode-long-switch"):
         old = "\t\tfor (int i = 0; i < len; ++i) out[n++] = static_cast<char>(tail >> (56 - 8 * i));"
         lines = ["\t\tswitch (len) {"]
         for n in range(8, 0, -1):
@@ -22,6 +22,14 @@ def main() -> None:
             )
         lines += ["\t\t}", "\t\tn += len;"]
         new = "\n".join(lines)
+        if sys.argv[1] == "encode-long-switch":
+            new = (
+                "\t\tif (len < 6) {\n\t"
+                + old
+                + "\n\t\t} else {\n"
+                + "\n".join("\t" + line for line in lines)
+                + "\n\t\t}"
+            )
     elif sys.argv[1] == "decode-switch":
         old = "\tfor (std::size_t k = 0; k < len; ++k) tail |= static_cast<std::uint64_t>(at(i + k)) << (56 - 8 * k);"
         lines = ["\tswitch (len) {"]

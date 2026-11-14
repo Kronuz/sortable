@@ -50,7 +50,7 @@ template<class T> void measure(const std::string& name, const std::vector<T>& va
     total += bytes[i].size();
     const T roundtrip = old_decode(bytes[i]);
     if (roundtrip != values[i] && !(std::is_same_v<T,double> && std::isnan(roundtrip) && std::isnan(values[i])))
-      throw std::runtime_error("old codec input failed roundtrip");
+      { std::fprintf(stderr, "old roundtrip: set=%s input=%.21Lg output=%.21Lg\n", name.c_str(), static_cast<long double>(values[i]), static_cast<long double>(roundtrip)); throw std::runtime_error("old codec input failed roundtrip"); }
 #else
     bytes[i].size = sortable::encode(values[i], bytes[i].bytes.data());
     total += bytes[i].size;
@@ -110,8 +110,12 @@ int main(int argc, char** argv) {
       measure("uniform-"+std::to_string(width), si, passes); measure("uniform-"+std::to_string(width), ui, passes);
     }
     std::vector<double> doubles;
-    for (int i=0; i<10000; ++i) doubles.push_back(std::bit_cast<double>(rng()));
-    measure("uniform-binary64-bits", doubles, passes);
+    const bool finite_only = argc > 3 && std::string(argv[3]) == "finite";
+    for (int i=0; i<10000; ++i) {
+      const double value = std::bit_cast<double>(rng());
+      if (!finite_only || std::isfinite(value)) doubles.push_back(value);
+    }
+    measure(finite_only ? "uniform-finite-binary64-bits" : "uniform-binary64-bits", doubles, passes);
     if (argc > 1 && std::string(argv[1]) != "-") {
       std::ifstream input(argv[1]);
       if (!input) throw std::runtime_error("cannot open corpus");

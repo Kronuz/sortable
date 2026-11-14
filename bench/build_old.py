@@ -35,6 +35,7 @@ def main() -> None:
                 / "src"
                 / "sortable_serialise.cc.o"
             ),
+            str(build / "_deps" / "cartesian-build" / "libcartesian.a"),
             "-o",
             sys.argv[2],
         ],

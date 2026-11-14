@@ -1,0 +1,218 @@
+set	type	values	sample	encode_ns	decode_ns	bytes
+uniform-8	int64	10000	0	4.1625	16.4224	1.9390
+uniform-8	int64	10000	1	4.1215	16.4089	1.9390
+uniform-8	int64	10000	2	4.1326	16.3750	1.9390
+uniform-8	int64	10000	3	4.1269	16.4684	1.9390
+uniform-8	int64	10000	4	4.1265	16.4144	1.9390
+uniform-8	int64	10000	5	4.1231	16.4255	1.9390
+uniform-8	int64	10000	6	4.1373	16.5020	1.9390
+uniform-8	uint64	10000	0	3.0914	14.5643	1.9650
+uniform-8	uint64	10000	1	3.0675	14.5667	1.9650
+uniform-8	uint64	10000	2	3.0573	14.4426	1.9650
+uniform-8	uint64	10000	3	3.0650	14.4351	1.9650
+uniform-8	uint64	10000	4	3.0508	14.4351	1.9650
+uniform-8	uint64	10000	5	3.0610	14.4242	1.9650
+uniform-8	uint64	10000	6	3.0552	14.4237	1.9650
+uniform-16	int64	10000	0	4.4171	17.0646	2.9346
+uniform-16	int64	10000	1	4.4291	16.8315	2.9346
+uniform-16	int64	10000	2	4.4181	16.7372	2.9346
+uniform-16	int64	10000	3	4.4330	16.7769	2.9346
+uniform-16	int64	10000	4	4.4238	16.7479	2.9346
+uniform-16	int64	10000	5	4.4242	16.7346	2.9346
+uniform-16	int64	10000	6	4.4199	16.8249	2.9346
+uniform-16	uint64	10000	0	3.1005	14.6161	2.9630
+uniform-16	uint64	10000	1	3.0955	14.6915	2.9630
+uniform-16	uint64	10000	2	3.0989	14.6268	2.9630
+uniform-16	uint64	10000	3	3.1167	14.6297	2.9630
+uniform-16	uint64	10000	4	3.1219	14.7560	2.9630
+uniform-16	uint64	10000	5	3.1489	14.8309	2.9630
+uniform-16	uint64	10000	6	3.1243	14.7431	2.9630
+uniform-32	int64	10000	0	4.9180	17.9207	4.9375
+uniform-32	int64	10000	1	4.9196	18.2178	4.9375
+uniform-32	int64	10000	2	4.9267	17.9264	4.9375
+uniform-32	int64	10000	3	4.9263	17.9412	4.9375
+uniform-32	int64	10000	4	4.8968	17.9654	4.9375
+uniform-32	int64	10000	5	4.9096	17.9015	4.9375
+uniform-32	int64	10000	6	4.9133	17.8609	4.9375
+uniform-32	uint64	10000	0	3.1380	15.7164	4.9613
+uniform-32	uint64	10000	1	3.1561	15.7192	4.9613
+uniform-32	uint64	10000	2	3.1344	15.7229	4.9613
+uniform-32	uint64	10000	3	3.1371	15.7450	4.9613
+uniform-32	uint64	10000	4	3.0527	15.3143	4.9613
+uniform-32	uint64	10000	5	3.0643	15.4574	4.9613
+uniform-32	uint64	10000	6	3.2025	15.9932	4.9613
+uniform-64	int64	10000	0	6.0495	20.4382	8.9402
+uniform-64	int64	10000	1	6.0886	20.1369	8.9402
+uniform-64	int64	10000	2	6.0738	20.2601	8.9402
+uniform-64	int64	10000	3	6.0698	20.2406	8.9402
+uniform-64	int64	10000	4	6.0671	20.2614	8.9402
+uniform-64	int64	10000	5	6.1880	20.6064	8.9402
+uniform-64	int64	10000	6	6.0400	20.1400	8.9402
+uniform-64	uint64	10000	0	4.7962	17.8858	8.9672
+uniform-64	uint64	10000	1	4.7991	18.4059	8.9672
+uniform-64	uint64	10000	2	4.8423	17.9149	8.9672
+uniform-64	uint64	10000	3	4.7990	17.8642	8.9672
+uniform-64	uint64	10000	4	4.7999	17.7743	8.9672
+uniform-64	uint64	10000	5	4.8020	17.9405	8.9672
+uniform-64	uint64	10000	6	4.7897	17.8584	8.9672
+uniform-finite-binary64-bits	double	9996	0	8.2377	27.1257	9.8185
+uniform-finite-binary64-bits	double	9996	1	8.2291	27.2682	9.8185
+uniform-finite-binary64-bits	double	9996	2	8.2299	27.4074	9.8185
+uniform-finite-binary64-bits	double	9996	3	8.3090	27.4264	9.8185
+uniform-finite-binary64-bits	double	9996	4	8.4287	27.5526	9.8185
+uniform-finite-binary64-bits	double	9996	5	8.3126	27.4764	9.8185
+uniform-finite-binary64-bits	double	9996	6	8.2559	27.5421	9.8185
+accounts._id	int64	1000	0	4.3444	13.3375	2.2340
+accounts._id	int64	1000	1	3.9268	13.3146	2.2340
+accounts._id	int64	1000	2	3.9919	13.0959	2.2340
+accounts._id	int64	1000	3	3.8898	13.0963	2.2340
+accounts._id	int64	1000	4	3.8895	12.9956	2.2340
+accounts._id	int64	1000	5	3.9115	13.0021	2.2340
+accounts._id	int64	1000	6	3.9009	13.1774	2.2340
+accounts._id	uint64	1000	0	2.9503	14.3767	2.2340
+accounts._id	uint64	1000	1	2.9506	14.8795	2.2340
+accounts._id	uint64	1000	2	2.9437	14.3268	2.2340
+accounts._id	uint64	1000	3	2.9497	14.3298	2.2340
+accounts._id	uint64	1000	4	2.9525	14.4089	2.2340
+accounts._id	uint64	1000	5	2.9484	14.5049	2.2340
+accounts._id	uint64	1000	6	2.9800	14.5038	2.2340
+accounts._id	double	1000	0	4.6602	17.1385	2.2340
+accounts._id	double	1000	1	4.6734	16.5933	2.2340
+accounts._id	double	1000	2	4.4753	16.6485	2.2340
+accounts._id	double	1000	3	4.4851	16.9589	2.2340
+accounts._id	double	1000	4	4.7637	16.6940	2.2340
+accounts._id	double	1000	5	4.7541	16.4884	2.2340
+accounts._id	double	1000	6	5.1613	16.7114	2.2340
+accounts.accountNumber	int64	1000	0	4.4041	15.2522	3.7390
+accounts.accountNumber	int64	1000	1	4.4350	15.2162	3.7390
+accounts.accountNumber	int64	1000	2	4.4014	15.6467	3.7390
+accounts.accountNumber	int64	1000	3	4.4066	15.2500	3.7390
+accounts.accountNumber	int64	1000	4	4.4144	15.4266	3.7390
+accounts.accountNumber	int64	1000	5	4.4253	15.9105	3.7390
+accounts.accountNumber	int64	1000	6	4.5149	15.6195	3.7390
+accounts.accountNumber	uint64	1000	0	2.9904	16.6535	3.7390
+accounts.accountNumber	uint64	1000	1	2.9939	16.6792	3.7390
+accounts.accountNumber	uint64	1000	2	3.6347	16.5593	3.7390
+accounts.accountNumber	uint64	1000	3	2.9616	16.5944	3.7390
+accounts.accountNumber	uint64	1000	4	2.9933	16.7063	3.7390
+accounts.accountNumber	uint64	1000	5	3.0001	16.5478	3.7390
+accounts.accountNumber	uint64	1000	6	3.1275	16.8521	3.7390
+accounts.accountNumber	double	1000	0	6.5943	18.8883	3.7390
+accounts.accountNumber	double	1000	1	6.6856	19.0146	3.7390
+accounts.accountNumber	double	1000	2	6.5061	19.0150	3.7390
+accounts.accountNumber	double	1000	3	6.4944	19.2616	3.7390
+accounts.accountNumber	double	1000	4	6.5625	20.0490	3.7390
+accounts.accountNumber	double	1000	5	6.6361	18.9923	3.7390
+accounts.accountNumber	double	1000	6	6.4782	19.0903	3.7390
+accounts.age	int64	1000	0	4.0442	15.6156	1.9530
+accounts.age	int64	1000	1	4.0506	13.7301	1.9530
+accounts.age	int64	1000	2	5.3235	13.3423	1.9530
+accounts.age	int64	1000	3	4.0526	13.2309	1.9530
+accounts.age	int64	1000	4	4.1969	14.2180	1.9530
+accounts.age	int64	1000	5	4.0398	13.6023	1.9530
+accounts.age	int64	1000	6	4.0410	13.5751	1.9530
+accounts.age	uint64	1000	0	2.9619	14.5614	1.9530
+accounts.age	uint64	1000	1	2.9863	14.6219	1.9530
+accounts.age	uint64	1000	2	3.0044	14.6202	1.9530
+accounts.age	uint64	1000	3	2.9505	14.6299	1.9530
+accounts.age	uint64	1000	4	2.9518	14.6861	1.9530
+accounts.age	uint64	1000	5	2.9537	14.5739	1.9530
+accounts.age	uint64	1000	6	2.9500	14.6755	1.9530
+accounts.age	double	1000	0	4.9583	16.5887	1.9530
+accounts.age	double	1000	1	4.8823	17.1092	1.9530
+accounts.age	double	1000	2	4.7455	17.1177	1.9530
+accounts.age	double	1000	3	4.9605	17.2884	1.9530
+accounts.age	double	1000	4	4.9192	17.1259	1.9530
+accounts.age	double	1000	5	4.9700	16.6382	1.9530
+accounts.age	double	1000	6	4.9150	16.7962	1.9530
+accounts.balance	double	1000	0	6.8560	19.5148	7.8220
+accounts.balance	double	1000	1	6.8283	19.6166	7.8220
+accounts.balance	double	1000	2	6.7850	19.3570	7.8220
+accounts.balance	double	1000	3	6.7713	19.2469	7.8220
+accounts.balance	double	1000	4	6.7734	19.4094	7.8220
+accounts.balance	double	1000	5	6.7717	19.4619	7.8220
+accounts.balance	double	1000	6	6.7882	19.5465	7.8220
+cities._id	int64	1000	0	3.8779	12.9200	2.2340
+cities._id	int64	1000	1	3.8756	12.9446	2.2340
+cities._id	int64	1000	2	3.8735	12.9796	2.2340
+cities._id	int64	1000	3	3.8720	12.9376	2.2340
+cities._id	int64	1000	4	3.8780	12.9852	2.2340
+cities._id	int64	1000	5	3.8645	12.9572	2.2340
+cities._id	int64	1000	6	3.8746	12.8946	2.2340
+cities._id	uint64	1000	0	2.9397	14.3359	2.2340
+cities._id	uint64	1000	1	2.9570	14.4653	2.2340
+cities._id	uint64	1000	2	2.9446	14.3677	2.2340
+cities._id	uint64	1000	3	2.9417	14.3311	2.2340
+cities._id	uint64	1000	4	2.9378	14.4258	2.2340
+cities._id	uint64	1000	5	2.9550	14.3984	2.2340
+cities._id	uint64	1000	6	2.9350	14.4286	2.2340
+cities._id	double	1000	0	4.7507	16.6970	2.2340
+cities._id	double	1000	1	4.4765	16.4734	2.2340
+cities._id	double	1000	2	4.5663	16.9213	2.2340
+cities._id	double	1000	3	4.6347	16.9674	2.2340
+cities._id	double	1000	4	4.4930	16.4274	2.2340
+cities._id	double	1000	5	4.6581	16.4836	2.2340
+cities._id	double	1000	6	4.5072	16.7276	2.2340
+cities.population	int64	1000	0	4.3620	13.9563	3.1070
+cities.population	int64	1000	1	4.3509	13.9523	3.1070
+cities.population	int64	1000	2	4.3337	13.9835	3.1070
+cities.population	int64	1000	3	4.3573	14.4653	3.1070
+cities.population	int64	1000	4	4.3785	14.0393	3.1070
+cities.population	int64	1000	5	4.4013	13.8930	3.1070
+cities.population	int64	1000	6	4.3548	14.4211	3.1070
+cities.population	uint64	1000	0	2.9695	15.1830	3.1070
+cities.population	uint64	1000	1	2.9629	15.1188	3.1070
+cities.population	uint64	1000	2	2.9533	15.1511	3.1070
+cities.population	uint64	1000	3	2.9617	15.1703	3.1070
+cities.population	uint64	1000	4	2.9480	15.1513	3.1070
+cities.population	uint64	1000	5	2.9475	15.0841	3.1070
+cities.population	uint64	1000	6	2.9397	15.0806	3.1070
+cities.population	double	1000	0	5.6178	17.6300	3.1070
+cities.population	double	1000	1	5.3442	18.1441	3.1070
+cities.population	double	1000	2	5.3053	17.9398	3.1070
+cities.population	double	1000	3	5.3542	17.9842	3.1070
+cities.population	double	1000	4	5.3162	17.4221	3.1070
+cities.population	double	1000	5	5.3491	17.4537	3.1070
+cities.population	double	1000	6	5.3213	17.5185	3.1070
+cities coordinates as floating	double	2000	0	7.4322	19.6075	7.9425
+cities coordinates as floating	double	2000	1	7.6139	19.8518	7.9425
+cities coordinates as floating	double	2000	2	7.0583	19.4416	7.9425
+cities coordinates as floating	double	2000	3	7.0674	19.6033	7.9425
+cities coordinates as floating	double	2000	4	7.0499	20.2000	7.9425
+cities coordinates as floating	double	2000	5	7.0701	19.5623	7.9425
+cities coordinates as floating	double	2000	6	7.0327	19.8657	7.9425
+file sizes (bytes)	int64	200000	0	4.9557	13.8081	2.1920
+file sizes (bytes)	int64	200000	1	4.9565	13.7673	2.1920
+file sizes (bytes)	int64	200000	2	4.9856	13.8502	2.1920
+file sizes (bytes)	int64	200000	3	5.0100	14.0672	2.1920
+file sizes (bytes)	int64	200000	4	5.0399	13.7532	2.1920
+file sizes (bytes)	int64	200000	5	4.9488	13.7255	2.1920
+file sizes (bytes)	int64	200000	6	4.9728	13.8482	2.1920
+file sizes (bytes)	uint64	200000	0	3.7458	14.9074	2.1920
+file sizes (bytes)	uint64	200000	1	3.7653	14.9346	2.1920
+file sizes (bytes)	uint64	200000	2	3.8037	14.9278	2.1920
+file sizes (bytes)	uint64	200000	3	3.8132	14.8870	2.1920
+file sizes (bytes)	uint64	200000	4	3.7168	14.3293	2.1920
+file sizes (bytes)	uint64	200000	5	3.7824	15.3327	2.1920
+file sizes (bytes)	uint64	200000	6	3.8741	15.4883	2.1920
+file sizes (bytes)	double	200000	0	6.0529	18.0642	2.1920
+file sizes (bytes)	double	200000	1	5.6874	15.9058	2.1920
+file sizes (bytes)	double	200000	2	5.6687	15.7913	2.1920
+file sizes (bytes)	double	200000	3	5.4080	15.6517	2.1920
+file sizes (bytes)	double	200000	4	5.2766	15.8172	2.1920
+file sizes (bytes)	double	200000	5	5.5743	15.8915	2.1920
+file sizes (bytes)	double	200000	6	5.4241	15.8609	2.1920
+file mtimes (datetime, us)	double	200000	0	5.5642	19.5115	6.2704
+file mtimes (datetime, us)	double	200000	1	5.8888	17.3845	6.2704
+file mtimes (datetime, us)	double	200000	2	5.8239	17.9252	6.2704
+file mtimes (datetime, us)	double	200000	3	6.1584	18.9370	6.2704
+file mtimes (datetime, us)	double	200000	4	5.7174	17.4081	6.2704
+file mtimes (datetime, us)	double	200000	5	5.5784	18.1262	6.2704
+file mtimes (datetime, us)	double	200000	6	6.3399	19.1643	6.2704
+git commit times (datetime, s)	double	26977	0	5.4353	18.1506	4.9854
+git commit times (datetime, s)	double	26977	1	5.5753	18.0921	4.9854
+git commit times (datetime, s)	double	26977	2	5.4150	17.9487	4.9854
+git commit times (datetime, s)	double	26977	3	5.3387	18.1976	4.9854
+git commit times (datetime, s)	double	26977	4	5.4617	18.1693	4.9854
+git commit times (datetime, s)	double	26977	5	5.3726	18.0355	4.9854
+git commit times (datetime, s)	double	26977	6	5.3554	17.9913	4.9854

@@ -13,6 +13,9 @@
 #include <string>
 #include <vector>
 #include "sortable.hh"
+#ifdef SORTABLE_OLD_CODEC
+#include "serialise.h"
+#endif
 
 namespace {
 volatile std::uint64_t sink = 0;
@@ -26,29 +29,60 @@ template<class T> inline void escape(const T& value) { sink = sink ^ sizeof(valu
 
 template<class T> void measure(const std::string& name, const std::vector<T>& values, int passes) {
   if (values.empty()) return;
+#ifdef SORTABLE_OLD_CODEC
+  std::vector<std::string> bytes(values.size());
+  auto old_encode = [](T value) {
+    if constexpr (std::is_same_v<T, double>) return Serialise::serialise(static_cast<long double>(value));
+    else return Serialise::serialise(value);
+  };
+  auto old_decode = [](std::string_view data) {
+    if constexpr (std::is_same_v<T, double>) return static_cast<double>(Unserialise::floating(data));
+    else if constexpr (std::is_signed_v<T>) return Unserialise::integer(data);
+    else return Unserialise::positive(data);
+  };
+#else
   std::vector<encoded> bytes(values.size());
+#endif
   std::size_t total = 0;
   for (std::size_t i = 0; i < values.size(); ++i) {
+#ifdef SORTABLE_OLD_CODEC
+    bytes[i] = old_encode(values[i]);
+    total += bytes[i].size();
+    const T roundtrip = old_decode(bytes[i]);
+    if (roundtrip != values[i] && !(std::is_same_v<T,double> && std::isnan(roundtrip) && std::isnan(values[i])))
+      throw std::runtime_error("old codec input failed roundtrip");
+#else
     bytes[i].size = sortable::encode(values[i], bytes[i].bytes.data());
     total += bytes[i].size;
     const auto decoded = sortable::decode({bytes[i].bytes.data(), bytes[i].size});
     if (!decoded) throw std::runtime_error("benchmark input failed decoding");
+#endif
   }
   const char* type = std::is_same_v<T, double> ? "double" : std::is_signed_v<T> ? "int64" : "uint64";
   if (passes == 0) { std::printf("%s\t%s\t%zu\tcheck\t-\t-\t%.4f\n", name.c_str(), type, values.size(), double(total)/values.size()); return; }
   for (int sample = -1; sample < 7; ++sample) {
     const auto start = clock_type::now();
     for (int repeat = 0; repeat < passes; ++repeat) {
-      for (const T value : values) { char out[sortable::max_size]; const auto n = sortable::encode(value, out); escape(out); escape(n); }
+      for (const T value : values) {
+#ifdef SORTABLE_OLD_CODEC
+        const auto out = old_encode(value); escape(out);
+#else
+        char out[sortable::max_size]; const auto n = sortable::encode(value, out); escape(out); escape(n);
+#endif
+      }
     }
     const auto middle = clock_type::now();
     for (int repeat = 0; repeat < passes; ++repeat) {
       for (const auto& b : bytes) {
+#ifdef SORTABLE_OLD_CODEC
+        const auto value = old_decode(b); escape(value);
+#else
         const auto n = sortable::decode({b.bytes.data(), b.size});
         if (!n) std::abort();
         if constexpr (std::is_same_v<T, double>) { const auto value = n->to_double(); escape(value); }
         else if constexpr (std::is_signed_v<T>) { const auto value = n->to_int64(); escape(value); }
         else { const auto value = n->to_uint64(); escape(value); }
+#endif
       }
     }
     const auto end = clock_type::now();

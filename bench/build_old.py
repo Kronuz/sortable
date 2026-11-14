@@ -1,6 +1,7 @@
-"""Build the public-API black-box bench: build_old.py XAPIAND_BUILD OUTPUT.
+"""Build the public-API black-box bench: build_old.py XAPIAND_BUILD OUTPUT [new].
 
 Reuses generated compiler flags and the existing opaque codec object. Run under quiet light.
+The optional new mode uses identical flags for a fair native-codec comparison.
 No codec implementation source is opened by this script.
 """
 
@@ -24,7 +25,7 @@ def main() -> None:
         [
             "/usr/bin/c++",
             *options,
-            "-DSORTABLE_OLD_CODEC",
+            *(["-DSORTABLE_OLD_CODEC"] if sys.argv[3:] != ["new"] else []),
             "-I",
             str(root),
             str(root / "bench" / "speed.cc"),

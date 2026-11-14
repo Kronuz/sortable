@@ -66,6 +66,8 @@ template<class T> void measure(const std::string& name, const std::vector<T>& va
       for (const T value : values) {
 #ifdef SORTABLE_OLD_CODEC
         const auto out = old_encode(value); escape(out);
+#elif defined(SORTABLE_STRING_CODEC)
+        const auto out = sortable::encode(value); escape(out);
 #else
         char out[sortable::max_size]; const auto n = sortable::encode(value, out); escape(out); escape(n);
 #endif

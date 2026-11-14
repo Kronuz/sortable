@@ -1,4 +1,4 @@
-"""Build the public-API black-box bench: build_old.py XAPIAND_BUILD OUTPUT [new].
+"""Build the public-API black-box bench: build_old.py XAPIAND_BUILD OUTPUT [old|new|string].
 
 Reuses generated compiler flags and the existing opaque codec object. Run under quiet light.
 The optional new mode uses identical flags for a fair native-codec comparison.
@@ -20,12 +20,18 @@ def main() -> None:
     for line in flags.read_text().splitlines():
         if line.startswith(("CXX_DEFINES =", "CXX_INCLUDES =", "CXX_FLAGS =")):
             options.extend(shlex.split(line.split("=", 1)[1]))
+    mode = sys.argv[3] if len(sys.argv) > 3 else "old"
+    mode_flags = {
+        "old": ["-DSORTABLE_OLD_CODEC"],
+        "new": [],
+        "string": ["-DSORTABLE_STRING_CODEC"],
+    }[mode]
     root = Path(__file__).resolve().parents[1]
     subprocess.run(
         [
             "/usr/bin/c++",
             *options,
-            *(["-DSORTABLE_OLD_CODEC"] if sys.argv[3:] != ["new"] else []),
+            *mode_flags,
             "-I",
             str(root),
             str(root / "bench" / "speed.cc"),

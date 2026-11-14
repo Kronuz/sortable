@@ -37,6 +37,10 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     target_link_options(sortable_fuzz PRIVATE -fsanitize=fuzzer,address,undefined)
   endif()
 
+  # Input generation stays outside the timed codec loops.
+  add_executable(sortable_speed bench/speed.cc)
+  target_link_libraries(sortable_speed PRIVATE sortable)
+
   # Every float, minutes long: not in CI.
   option(SORTABLE_EXHAUSTIVE "Build the exhaustive binary32 check" OFF)
   if(SORTABLE_EXHAUSTIVE)

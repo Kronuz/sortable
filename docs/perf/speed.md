@@ -42,8 +42,13 @@ Host: x86_64 macOS, AppleClang 17.0.0.17000604, CMake Release. `file build/sorta
 reports a Mach-O x86_64 executable. The following ran under `quiet light` (10 minutes each):
 Release build, all five CTests (including property, fixtures and model/CLI comparisons), and
 `sortable_speed build/real-values.tsv 0` (untimed validation of every benchmark distribution).
-All passed. Ruff and Pyrefly strict checked the Python exporter. A fuzz-corpus replay is
-not yet run; the codec implementation is byte-for-byte unchanged.
+All passed, and the standalone fuzz driver replayed all 190 existing corpus files with
+no failure. Ruff and Pyrefly strict checked the Python exporter. The codec implementation
+is byte-for-byte unchanged.
+
+The branch push does not trigger this repository's branch-filtered CI. A manual dispatch
+started [CI run 43537630078](https://github.com/Kronuz/sortable/actions/runs/43537630078)
+at `sortable:2f9a5ab`; its result was pending when this note was written.
 
 From the sortable checkout, with `ROOT=/Users/kronuz/code/Kronuz`:
 
@@ -51,6 +56,7 @@ From the sortable checkout, with `ROOT=/Users/kronuz/code/Kronuz`:
 quiet check
 quiet light c1-build 10 'Build codec benchmark' -- sh -c 'cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build -j4'
 quiet light c1-tests 10 'Codec tests' -- ctest --test-dir build -j4 --output-on-failure
+quiet light c1-replay 10 'Replay existing fuzz corpus' -- sh -c 'build/sortable_standalone_fuzz fuzz/corpus/*'
 git -C "$ROOT/Xapiand" show design/sortable-encoding:docs/design/sortable-encoding/sizes.py > build/design-sizes.py
 quiet light c1-corpus 10 'Export actual design values' -- sh -c 'python3 -I bench/export_values.py build/design-sizes.py "$1/docs/public/assets" "$2" "$2" 200000 > build/real-values.tsv' sh "$ROOT/Xapiand" "$ROOT"
 quiet light c1-check 10 'Validate benchmark input without timing' -- build/sortable_speed build/real-values.tsv 0

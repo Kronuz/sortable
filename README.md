@@ -61,25 +61,21 @@ int main() {
 
 ## ⚡ Performance
 
-Nanoseconds per value on Linux x86_64 (GCC 13.3, O3), against the codec it replaces: Xapian's
-`sortable_serialise` as Xapiand used it, called as a black box through Xapiand's public API. Sets
-are real field values from a 434,977-value corpus; medians of three interleaved runs.
+Nanoseconds and bytes per value on Linux x86_64 (GCC 13.3, O3; medians of three interleaved
+runs). Encode writes into a caller's buffer; decode returns the typed value.
 
-| Values | Encode: old → sortable | Decode: old | strict `decode` | trusted `to_*` | Bytes: old → sortable |
-|---|---:|---:|---:|---:|---:|
-| Document ids (int64) | 38.2 → 5.4 (7.0× faster) | 19.6 | 6.7 | 5.1 (3.8× faster) | 2.68 → 2.23 |
-| Account numbers (double) | 38.9 → 7.6 (5.2× faster) | 17.6 | 12.8 | 8.0 (2.2× faster) | 3.94 → 3.74 |
-| Balances (double) | 38.4 → 9.3 (4.2× faster) | 18.9 | 12.6 | 8.2 (2.3× faster) | 7.83 → 7.82 |
-| File mtimes, µs (double) | 40.1 → 9.3 (4.3× faster) | 18.4 | 12.5 | 8.5 (2.2× faster) | 6.29 → 6.27 |
+| Values | Encode | Decode: strict `decode` | Decode: trusted `to_*` | Bytes |
+|---|---:|---:|---:|---:|
+| Document ids (int64) | 3.0 | 6.7 | 5.1 | 2.23 |
+| Account numbers (double) | 7.0 | 12.8 | 8.0 | 3.74 |
+| Balances (double) | 6.9 | 12.6 | 8.2 | 7.82 |
+| File mtimes, µs (double) | 6.6 | 12.5 | 8.5 | 6.27 |
+| Random 64-bit uint64 | 5.4 | 11.1 | 7.4 | 8.97 |
+| Random 64-bit int64 | 8.9 | 13.0 | 9.5 | 8.94 |
 
-- Encode is faster on all 31 value sets on Linux and on macOS x86_64.
-- Trusted decode is faster on every real value set on both platforms, 26-65% on macOS; only
-  uniformly random double bit patterns on macOS come out even (+2.2%, inside the noise band).
-- Strict `decode` is 3.6-7.9% slower than the old codec on two double sets on macOS. The
-  canonical checks are that difference, and the trusted path drops them.
-
-Method, every set, the A/A bands and the experiments that did not pay:
-[docs/perf/speed.md](docs/perf/speed.md) and [docs/perf/trusted-decode.md](docs/perf/trusted-decode.md).
+The trusted conversions skip only the canonical checks, which is most of the gap between the two
+decode columns. Every value set, the macOS numbers and the method:
+[docs/perf/](docs/perf/).
 
 ## 📦 Installation
 

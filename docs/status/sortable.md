@@ -1,4 +1,4 @@
-> Status: CURRENT (2026-11-09) ledger for step 1 of the sortable-codec work: the `sortable` library.
+> Status: CURRENT (2026-11-15) ledger for the `sortable` library.
 
 # sortable (library)
 
@@ -24,11 +24,19 @@
     `tools/check_cli.py` (CTest `sortable_cli`) drives it against the model over 213,491 values and
     741,467 decoder inputs, 0 mismatches. The protocol is in `docs/mechanisms/sortable.md`.
 
-Job ids and run counts for 8-10 are in the Xapiand campaign's `sortable-proof` journal.
+11. Trusted conversions `to_double`, `to_int64`, `to_uint64` on stored bytes: only the read-bound
+    rules, checked against `decode` on every vector, property value and fuzz input; 674M fuzz inputs
+    over 1.06 sanitizer CPU-hours, 0 findings.
+12. `bench/speed.cc` (`-DSORTABLE_BENCH=ON`): encode, strict and trusted decode per value set on
+    macOS and Linux; results in `docs/perf/`, raw timings in history at `d927b7e`.
+
+Job ids and run counts for 8-10 are in the Xapiand campaign's `sortable-proof` journal, for 11-12
+in `docs/perf/`.
 
 ## Next
 
-1. The security reviewer's decoder review and a code review of 8-10.
+1. Xapiand's sortable-encoding quest pins this `main` and replaces its old codec, `decode` for
+   client bytes and the trusted conversions for stored values.
 2. Optionally add the sub-1/16 s sets to the design's size table, so T5 against the old codec guards the window.
 
 ## Blocked on

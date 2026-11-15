@@ -1,4 +1,4 @@
-> Status: CURRENT (2026-11-09) how `sortable.hh` encodes a number. The bytes are fixed by `tools/model.py`.
+> Status: CURRENT (2026-11-15) how `sortable.hh` encodes a number. The bytes are fixed by `tools/model.py`.
 
 # How sortable encodes a number
 
@@ -13,7 +13,7 @@ needs no conversion to sort or range over it. The order is
 ## The shape
 
 A finite nonzero value is |v| = 2^E x (1 + f), with E its binary exponent and f a fraction of at most 63
-bits (every `uint64` and every `double` fits; a subnormal `double` is normalised first). The encoding is
+bits (every `uint64` and every `double` fits; a subnormal `double` is normalized first). The encoding is
 a tag byte, an escape field only for the extreme tags, and a tail.
 
 ```
@@ -41,9 +41,7 @@ fraction 0 (an exact power of two, the empty tail) sorts first.
 A negative reverses all of it without a terminator. Its magnitude lies in (2^(U-1), 2^U], and it takes
 the tag of U with the tail 1 - f: a larger magnitude has a smaller 1 - f, and the lowest set bit of 1 - f
 is the lowest set bit of f, so the tail keeps its length and its nonzero last byte. -(2^U), the most
-negative value of its tag, has the empty tail and sorts first. The old Xapian codec complemented a
-trailing-zero-stripped tail instead, so a shorter negative was a prefix of a longer one and sorted first:
--(2^30) sorted before -(2^30) - 1.
+negative value of its tag, has the empty tail and sorts first.
 
 The encoding is not prefix-free. A caller that concatenates encodings frames them (escape `0x00`, end each
 with a terminator) or stores one number per value.
@@ -98,9 +96,9 @@ canonical identity matters; use the trusted conversions for bytes read back from
 
 The shape already holds them: exponents 64 to 127 use the `0xFE` escape, and a tail of up to 16 bytes
 carries 127 fraction bits, so `memcmp` order and cross-type equality hold unchanged. Adding them widens
-`decode`'s rules 6, 8 and 9, the trusted conversions' tail bound, and `max_size` (to 19 bytes); no value encodable today changes its bytes.
-Not built: no input reaches 128 bits (JSON and msgpack stop at 64), and a 128-bit significand would
-widen the 64-bit path.
+`decode`'s rules 6, 8 and 9, the trusted conversions' tail bound and `max_size` (to 19 bytes); no value
+encodable today changes its bytes. Not built: no input reaches 128 bits (JSON and msgpack stop at 64),
+and a 128-bit significand would widen the 64-bit path.
 
 ## What fixes the bytes
 

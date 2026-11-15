@@ -83,18 +83,22 @@ and `-1022 - exponent` cannot overflow an `int`. `decode` only produces numbers 
 [-1074, 1023] (or [0, 63] for an integer); a `number` built by hand with another exponent or significand
 still converts, but to a value that no `decode` produces.
 
-For bytes already written by `encode`, `to_double(bytes)`, `to_int64(bytes)`, and
-`to_uint64(bytes)` skip canonical validation. They return the same typed result as the
-corresponding conversion after `decode`. Empty input, short escape fields, and tails longer than
-eight bytes return no value; every other malformed input has an unspecified result. The parser
-still bounds every read and conversion for any byte string. Use `decode` when bytes may be
-untrusted or canonical identity matters.
+## The trusted conversions
+
+For bytes already written by `encode`, the free functions `to_double(bytes)`, `to_int64(bytes)` and
+`to_uint64(bytes)` convert without `decode`'s canonical checks. They keep only the rules that bound
+reads, 1, 3 and 6, and return no value when one fails; rules 2, 4, 5, 7, 8 and 9 are canonical checks
+and are skipped. On every output of `encode` the result equals the matching conversion after `decode`,
+including nearest-even rounding and the empty result for a value out of the type's range. Any other
+input still reads only within its bytes, allocates nothing, never throws and has no undefined
+behavior, but its result is unspecified. Use `decode` for bytes from outside the program, or when
+canonical identity matters; use the trusted conversions for bytes read back from your own storage.
 
 ## Reserved: 128-bit integers
 
 The shape already holds them: exponents 64 to 127 use the `0xFE` escape, and a tail of up to 16 bytes
 carries 127 fraction bits, so `memcmp` order and cross-type equality hold unchanged. Adding them widens
-`decode`'s rules 6, 8 and 9 and `max_size` (to 19 bytes); no value encodable today changes its bytes.
+`decode`'s rules 6, 8 and 9, the trusted conversions' tail bound, and `max_size` (to 19 bytes); no value encodable today changes its bytes.
 Not built: no input reaches 128 bits (JSON and msgpack stop at 64), and a 128-bit significand would
 widen the 64-bit path.
 
@@ -121,6 +125,9 @@ The decoder reads bytes from users' disks, so its proof does not rest on sampled
    taken as each type, round trip. The seeds are `tools/make_corpus.py`'s (each behind a split byte) and
    `fuzz/corpus` (190 raw encodings, so that whole inputs are accepted from the first run).
 4. `tools/mutants.py` drops one rule at a time and needs a test to fail for each.
+5. The trusted conversions are checked against `decode`: `sortable_test` on all 113,491 vectors,
+   `sortable_property` on every boundary and random value, and `fuzz/decode_fuzz.cc` on every input
+   `decode` accepts, while the fuzzer also runs them on every input it rejects under the sanitizers.
 
 ## The command-line driver
 

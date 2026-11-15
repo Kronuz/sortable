@@ -113,6 +113,8 @@ Not for:
 
 ## 📚 Documentation
 
+- [Sorted as Bytes](https://kronuz.github.io/blog/sortable/):
+  the Familiars post on why it exists and how it works.
 - [docs/mechanisms/sortable.md](docs/mechanisms/sortable.md): the byte layout, why the order
   holds, special values, the decoder's nine reject rules and the trusted conversions.
 - [docs/perf/](docs/perf/): encode and decode speed against the old codec, with method and data.

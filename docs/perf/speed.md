@@ -359,6 +359,10 @@ this report does not attribute it to a retained change or claim it proves an act
 
 ## Reproduction
 
+Raw timings and the 434,977-value corpus are kept in history, not in the tree: restore
+them with `git archive d927b7e docs/perf/data | tar -x` before the commands below. Build the
+bench with `-DSORTABLE_BENCH=ON`.
+
 Run from the sortable checkout. Every build/test uses `quiet light`, at most four jobs;
 every timing uses `quiet exclusive`, at most 10 minutes. `PASSES` is 40 for the final rows.
 The original native O3 exploratory A/A files use the same loop and settings except the older

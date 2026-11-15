@@ -21,8 +21,10 @@ scans and index values that compare with `memcmp` and never convert.
   compare with `memcmp`: no tag byte, no conversion.
 - **Short.** A single tag byte covers every exponent from 2^-60 to 2^63; 1 is one byte, 5 is two,
   a Unix timestamp in seconds is four. Never more than 10 bytes.
-- **A strict decoder.** `decode` takes any bytes, reads only inside them, allocates nothing and
-  never throws; it accepts exactly what `encode` writes. A libFuzzer target checks it.
+- **A strict decoder and a fast one.** `decode` takes any bytes, reads only inside them, allocates
+  nothing and never throws; it accepts exactly what `encode` writes. For bytes you wrote yourself,
+  `to_double`, `to_int64` and `to_uint64` skip the canonical checks but keep every bound. A
+  libFuzzer target checks both.
 - **Total.** -0.0 is 0, every NaN is one byte that sorts last, and the infinities have their own
   encodings; the encoder never fails.
 - **Same bytes everywhere.** Only integer arithmetic and `std::bit_cast`: no `long double`, no
@@ -51,8 +53,33 @@ int main() {
 	auto v = sortable::decode(std::string_view(buf, n));  // nullopt unless buf is exactly an encoding
 	assert(v && v->to_double() == 0.01 && !v->to_int64());
 	assert(v->saturate_int64() == 0);                     // truncates toward zero, clamps, NaN is 0
+
+	// Bytes read back from your own index: same result, no canonical checks.
+	assert(sortable::to_double(std::string_view(buf, n)) == 0.01);
 }
 ```
+
+## ⚡ Performance
+
+Nanoseconds per value on Linux x86_64 (GCC 13.3, O3), against the codec it replaces: Xapian's
+`sortable_serialise` as Xapiand used it, called as a black box through Xapiand's public API. Sets
+are real field values from a 434,977-value corpus; medians of three interleaved runs.
+
+| Values | Encode: old → sortable | Decode: old | strict `decode` | trusted `to_*` | Bytes: old → sortable |
+|---|---:|---:|---:|---:|---:|
+| Document ids (int64) | 38.2 → 5.4 (7.0× faster) | 19.6 | 6.7 | 5.1 (3.8× faster) | 2.68 → 2.23 |
+| Account numbers (double) | 38.9 → 7.6 (5.2× faster) | 17.6 | 12.8 | 8.0 (2.2× faster) | 3.94 → 3.74 |
+| Balances (double) | 38.4 → 9.3 (4.2× faster) | 18.9 | 12.6 | 8.2 (2.3× faster) | 7.83 → 7.82 |
+| File mtimes, µs (double) | 40.1 → 9.3 (4.3× faster) | 18.4 | 12.5 | 8.5 (2.2× faster) | 6.29 → 6.27 |
+
+- Encode is faster on all 31 value sets on Linux and on macOS x86_64.
+- Trusted decode is faster on every real value set on both platforms, 26-65% on macOS; only
+  uniformly random double bit patterns on macOS come out even (+2.2%, inside the noise band).
+- Strict `decode` is 3.6-7.9% slower than the old codec on two double sets on macOS. The
+  canonical checks are that difference, and the trusted path drops them.
+
+Method, every set, the A/A bands and the experiments that did not pay:
+[docs/perf/speed.md](docs/perf/speed.md) and [docs/perf/trusted-decode.md](docs/perf/trusted-decode.md).
 
 ## 📦 Installation
 
@@ -91,7 +118,8 @@ Not for:
 ## 📚 Documentation
 
 - [docs/mechanisms/sortable.md](docs/mechanisms/sortable.md): the byte layout, why the order
-  holds, special values and the decoder's nine reject rules.
+  holds, special values, the decoder's nine reject rules and the trusted conversions.
+- [docs/perf/](docs/perf/): encode and decode speed against the old codec, with method and data.
 - [AGENTS.md](AGENTS.md): repository map, invariants and traps.
 - [Kronuz C++ Libraries](https://github.com/Kronuz/cpp-libraries): the catalog of the family.
 
@@ -101,6 +129,7 @@ Not for:
 cmake -B build && cmake --build build && ctest --test-dir build
 cmake -B build -DSORTABLE_EXHAUSTIVE=ON && cmake --build build && build/sortable_exhaustive_float
 cmake -B build -DSORTABLE_FUZZ=ON -DCMAKE_CXX_COMPILER=clang++ && cmake --build build
+cmake -B build -DSORTABLE_BENCH=ON && cmake --build build && build/sortable_speed - 20
 python3 -I tools/mutants.py
 ```
 

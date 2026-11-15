@@ -156,6 +156,10 @@ the validation cost is the robust strict-to-safety difference.
 
 ## Reproduction
 
+Raw timings and the 434,977-value corpus are kept in history, not in the tree: restore
+them with `git archive d927b7e docs/perf/data | tar -x` before the commands below. Build the
+bench with `-DSORTABLE_BENCH=ON`.
+
 Run the local suite under a light hold with four build jobs. For the sanitizer fuzz target use
 Homebrew LLVM on macOS, and give libFuzzer a writable copy of `fuzz/corpus` under ignored
 `build/`. The fuzzer mutates its corpus directory.

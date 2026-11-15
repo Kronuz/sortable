@@ -61,6 +61,10 @@ void round_trip(const Item& it, const std::string& enc) {
 	if (!n) return;
 	CHECK_MSG(exact::compare(exact::from_number(*n), it.key) == 0, "%s decodes to another number", describe(it).c_str());
 	CHECK_MSG(exact::reencode(*n) == enc, "%s: not canonical", describe(it).c_str());
+	const auto td = sortable::to_double(enc);
+	CHECK_MSG(td && std::bit_cast<std::uint64_t>(*td) == std::bit_cast<std::uint64_t>(n->to_double()), "%s: trusted double", describe(it).c_str());
+	CHECK_MSG(sortable::to_int64(enc) == n->to_int64(), "%s: trusted int64", describe(it).c_str());
+	CHECK_MSG(sortable::to_uint64(enc) == n->to_uint64(), "%s: trusted uint64", describe(it).c_str());
 	switch (it.kind) {
 		case I64: CHECK_MSG(n->to_int64() == static_cast<std::int64_t>(it.raw), "%s", describe(it).c_str()); break;
 		case U64: CHECK_MSG(n->to_uint64() == it.raw, "%s", describe(it).c_str()); break;

@@ -59,9 +59,14 @@ void check_conversions(const sortable::number& n, const converted& c, std::strin
 // Decodes `in`; an accepted input re-encodes to itself and converts consistently.
 std::optional<sortable::number> accept(std::string_view in) {
 	const auto n = sortable::decode(in);
+	const auto td = sortable::to_double(in);
+	const auto ti = sortable::to_int64(in);
+	const auto tu = sortable::to_uint64(in);
 	if (n) {
 		if (exact::reencode(*n) != in) fail("accepted, not canonical", in);
 		check_conversions(*n, converted(*n), in);
+		if (!td || std::bit_cast<std::uint64_t>(*td) != std::bit_cast<std::uint64_t>(n->to_double()) ||
+		    ti != n->to_int64() || tu != n->to_uint64()) fail("trusted differs from strict", in);
 	}
 	return n;
 }

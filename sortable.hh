@@ -345,4 +345,75 @@ constexpr std::optional<number> decode(std::string_view bytes) noexcept {
 	return r;
 }
 
+namespace detail {
+
+// Parse stored bytes with only the bounds checks needed for arbitrary input.
+constexpr std::optional<number> decode_trusted(std::string_view bytes) noexcept {
+	const std::size_t size = bytes.size();
+	if (size == 0) return std::nullopt;
+	const char* p = bytes.data();
+	auto at = [p](std::size_t i) { return static_cast<std::uint8_t>(p[i]); };
+	const int tag = at(0);
+	if (tag == tag_zero || tag == tag_nan) {
+		number r;
+		r.type = tag == tag_zero ? number::kind::zero : number::kind::nan;
+		return r;
+	}
+	if (tag == 0 || tag == 0x7F) return std::nullopt;
+	const bool neg = tag < tag_zero;
+	const int t = neg ? 0xFF - tag : tag;
+	std::size_t i = 1;
+	int e;
+	if (t >= 0x82 && t <= 0xFD) {
+		e = lo_exp + t - 0x82;
+	} else {
+		if (size < 3) return std::nullopt;
+		int raw = (at(1) << 8) | at(2);
+		if (neg) raw = 0xFFFF - raw;
+		i = 3;
+		if (t == tag_esc_high && raw == 0xFFFF) {
+			number r;
+			r.type = neg ? number::kind::neg_inf : number::kind::pos_inf;
+			r.negative = neg;
+			return r;
+		}
+		e = t == tag_esc_low ? raw + min_exp : raw + hi_exp + 1;
+	}
+	const std::size_t len = size - i;
+	if (len > 8) return std::nullopt;
+	std::uint64_t tail = 0;
+	for (std::size_t k = 0; k < len; ++k) tail |= static_cast<std::uint64_t>(at(i + k)) << (56 - 8 * k);
+	std::uint64_t frac = tail;
+	if (neg && tail != 0) {
+		--e;
+		frac = std::uint64_t{0} - tail;
+	}
+	number r;
+	r.type = number::kind::finite;
+	r.negative = neg;
+	r.exponent = e;
+	r.significand = (std::uint64_t{1} << 63) | (frac >> 1);
+	return r;
+}
+
+}  // namespace detail
+
+// Stored bytes written by encode(): typed conversion without canonical validation.
+// Arbitrary input is bounded and never throws; malformed input can return any value.
+constexpr std::optional<double> to_double(std::string_view bytes) noexcept {
+	const auto n = detail::decode_trusted(bytes);
+	if (!n) return std::nullopt;
+	return n->to_double();
+}
+
+constexpr std::optional<std::int64_t> to_int64(std::string_view bytes) noexcept {
+	const auto n = detail::decode_trusted(bytes);
+	return n ? n->to_int64() : std::nullopt;
+}
+
+constexpr std::optional<std::uint64_t> to_uint64(std::string_view bytes) noexcept {
+	const auto n = detail::decode_trusted(bytes);
+	return n ? n->to_uint64() : std::nullopt;
+}
+
 }  // namespace sortable

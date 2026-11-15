@@ -85,6 +85,11 @@ static_assert(is(std::numeric_limits<double>::quiet_NaN(), "ff") && is(-std::num
 static_assert(is(5e-324, "810000") && is(-5e-324, "7effff"));
 static_assert(sortable::decode(std::string_view("\xbe", 1)).has_value());
 static_assert(!sortable::decode(std::string_view()).has_value());
+static_assert(sortable::to_int64(std::string_view("\xbe", 1)) == 1);
+static_assert(!sortable::to_double(std::string_view()).has_value());
+static_assert(noexcept(sortable::to_double(std::string_view())));
+static_assert(noexcept(sortable::to_int64(std::string_view())));
+static_assert(noexcept(sortable::to_uint64(std::string_view())));
 #endif
 
 namespace {
@@ -207,6 +212,14 @@ void conversions() {
 	CHECK(dec(sortable::encode(-INT64_C(9007199254740993))).to_double() == -9007199254740992.0);
 	// Predicates.
 	CHECK(dec(sortable::encode(0)).is_zero() && dec(sortable::encode(HUGE_VAL)).is_inf() && dec(sortable::encode(std::nan(""))).is_nan());
+	// A caller can ask for the wrong result kind, including at floating extremes.
+	CHECK(!sortable::to_int64(sortable::encode(DBL_MAX)));
+	CHECK(!sortable::to_uint64(sortable::encode(-DBL_MAX)));
+	CHECK(!sortable::to_int64(sortable::encode(UINT64_MAX)));
+	CHECK(!sortable::to_uint64(sortable::encode(INT64_MIN)));
+	CHECK(!sortable::to_double(std::string_view("\x81", 1)));
+	CHECK(!sortable::to_double(std::string_view("\xbe\x01\x02\x03\x04\x05\x06\x07\x08\x09", 10)));
+	CHECK(!sortable::to_int64(std::string_view("\xfe\xff\xfe\xff\xff\xff\xff\xff\xff\xff\xff", 11)));
 }
 
 void vectors() {
@@ -241,6 +254,10 @@ void vectors() {
 		if (n) {
 			CHECK_MSG(exact::compare(exact::from_number(*n), key) == 0, "%s", line.c_str());
 			CHECK_MSG(exact::reencode(*n) == unhex(hex), "%s", line.c_str());
+			const auto td = sortable::to_double(got);
+			CHECK_MSG(td && std::bit_cast<std::uint64_t>(*td) == std::bit_cast<std::uint64_t>(n->to_double()), "%s: trusted double", line.c_str());
+			CHECK_MSG(sortable::to_int64(got) == n->to_int64(), "%s: trusted int64", line.c_str());
+			CHECK_MSG(sortable::to_uint64(got) == n->to_uint64(), "%s: trusted uint64", line.c_str());
 		}
 	}
 	CHECK_MSG(lines >= 113000, "%zu vector lines", lines);

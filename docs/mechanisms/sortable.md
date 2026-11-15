@@ -83,6 +83,13 @@ and `-1022 - exponent` cannot overflow an `int`. `decode` only produces numbers 
 [-1074, 1023] (or [0, 63] for an integer); a `number` built by hand with another exponent or significand
 still converts, but to a value that no `decode` produces.
 
+For bytes already written by `encode`, `to_double(bytes)`, `to_int64(bytes)`, and
+`to_uint64(bytes)` skip canonical validation. They return the same typed result as the
+corresponding conversion after `decode`. Empty input, short escape fields, and tails longer than
+eight bytes return no value; every other malformed input has an unspecified result. The parser
+still bounds every read and conversion for any byte string. Use `decode` when bytes may be
+untrusted or canonical identity matters.
+
 ## Reserved: 128-bit integers
 
 The shape already holds them: exponents 64 to 127 use the `0xFE` escape, and a tail of up to 16 bytes

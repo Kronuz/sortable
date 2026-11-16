@@ -298,7 +298,7 @@ void random_pairs(Rng& r, std::uint64_t count) {
 			std::vector<Item> near;
 			const double d = (a.kind == F64) ? std::bit_cast<double>(a.raw) : (a.kind == F32 ? static_cast<double>(std::bit_cast<float>(static_cast<std::uint32_t>(a.raw))) : 0.0);
 			switch (r.u64() % 4) {
-				case 0: if (a.kind == I64) add_i64(near, static_cast<std::int64_t>(a.raw) + static_cast<std::int64_t>(r.u64() % 5) - 2); else near.push_back(b); break;
+				case 0: if (a.kind == I64) add_i64(near, static_cast<std::int64_t>(a.raw + r.u64() % 5 - 2)); else near.push_back(b); break;
 				case 1: if (a.kind == U64 && a.raw < UINT64_MAX - 2) add_u64(near, a.raw + r.u64() % 3); else near.push_back(b); break;
 				case 2: if (std::isfinite(d)) add_double(near, std::nextafter(d, (r.u64() & 1) ? HUGE_VAL : -HUGE_VAL)); else near.push_back(b); break;
 				default: near.push_back(b); break;
